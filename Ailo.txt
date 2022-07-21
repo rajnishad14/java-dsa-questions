@@ -1,0 +1,123 @@
+import java.util.*;
+
+public class Main {
+    private static final Queue<Creature> queue = new LinkedList<>();
+    private static final ArrayList<String> finalZombiePos = new ArrayList<>();
+    private static int max;
+    private static int[][] world;
+    private static int countCreature = 0;
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        world = new int[n][n];
+        max = n-1;
+        int zombieX = sc.nextInt();
+        int zombieY = sc.nextInt();
+        int countZombie = 0;
+        Creature zombie = new Creature(zombieX, zombieY, "ZOMBIE", countZombie, true);
+        int creatureCount = sc.nextInt();
+        while(creatureCount-->0){
+            int tempX = sc.nextInt();
+            int tempY = sc.nextInt();
+            world[tempX][tempY] = 1;
+        }
+        sc.nextLine();
+        char[] moves = sc.nextLine().toCharArray();
+        move(zombie, moves);
+        while (!queue.isEmpty()){
+            move(queue.remove(), moves);
+        }
+        System.out.println("zombies’ positions:");
+        for (String str: finalZombiePos){
+            System.out.println(str);
+        }
+        System.out.println("creatures’ positions:");
+        ArrayList<String> finalCreaturePos = new ArrayList<>();
+        for(int j=0;j<n;j++){
+            for(int i=0;i<n;i++){
+                if(world[i][j] == 1){
+                    finalCreaturePos.add("(" + i + ", " + j + ")");
+                }
+            }
+        }
+        for (String str: finalCreaturePos){
+            System.out.println(str);
+        }
+
+    }
+
+    private static void move(Creature zombie, char[] moves){
+        int finalX = zombie.x;
+        int finalY = zombie.y;
+        String type = zombie.type;
+        int number = zombie.num;
+        for (char c: moves){
+            int min = 0;
+            switch (c) {
+                case 'U': {
+                    if (finalY == min) {
+                        finalY = max;
+                    } else {
+                        finalY--;
+                    }
+                    process(finalX, finalY, type, number);
+                    break;
+                }
+                case 'R': {
+                    if (finalX == max) {
+                        finalX = 0;
+                    } else {
+                        finalX++;
+                    }
+                    process(finalX, finalY, type, number);
+                    break;
+                }
+                case 'D': {
+                    if (finalY == max) {
+                        finalY = min;
+                    } else {
+                        finalY++;
+                    }
+                    process(finalX, finalY, type, number);
+                    break;
+                }
+                case 'L': {
+                    if (finalX == min) {
+                        finalX = max;
+                    } else {
+                        finalX--;
+                    }
+                    process(finalX, finalY, type, number);
+                    break;
+                }
+            }
+        }
+        finalZombiePos.add("(" + finalX + ", " + finalY + ")");
+    }
+
+    static private void process(int x, int y, String type, int num){
+        if(world[x][y] == 1){
+            Creature creature = new Creature(x, y, "CREATURE", countCreature++, true);
+            queue.add(creature);
+            world[x][y] = 0;
+        }
+        System.out.printf("%s %d Moved (%d, %d)\n", type, num, x, y);
+    }
+    static class Creature {
+        int x;
+        int y;
+        boolean infected;
+        String type;
+
+        int num;
+        public Creature(int x, int y, String type, int num, boolean infected) {
+            this.x = x;
+            this.y = y;
+            this.infected = infected;
+            this.type = type;
+            this.num =num;
+        }
+    }
+}
+
+
